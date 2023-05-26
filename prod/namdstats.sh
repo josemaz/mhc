@@ -27,6 +27,8 @@ Metrics:
  19 PRESSAVG
  20 GPRESSAVG
 By default take Temperature (12)
+
+[-f filename]
     "
 
 }
@@ -36,7 +38,7 @@ By default take Temperature (12)
 ####### OPTIONS
 metric=12
 
-while getopts hm: option
+while getopts hm:f: option
 do
     case "${option}"
         in
@@ -47,6 +49,11 @@ do
             ;;
         m) metric=${OPTARG}
             ;;
+        f)
+           f=${OPTARG}
+           [[ ! -f $f ]] && echo "No existe $f" && exit 15
+            ;;
+
         ?)
             echo "Invalid option: -${OPTARG}."
             usage
@@ -62,5 +69,4 @@ metric=$((metric+1))
 ####### MAIN
 
 #cat launch/md.out | egrep "^ENERGY" | awk -v col=$metric '{print $col}' | head
-cat launch/md.out | egrep "^ENERGY" | awk -v N=$metric '{ sum += $N } END { if (NR > 0) print sum / NR }'
-
+cat $f | egrep "^ENERGY" | awk -v N=$metric '{ sum += $N } END { if (NR > 0) print sum / NR }'
